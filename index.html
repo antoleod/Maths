@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="color-scheme" content="light dark"/>
+<meta name="description" content="Appli de Léna — activités ludiques (lecture, maths, logique, arts) avec étoiles, pièces et effets magiques pour enfants."/>
+<title>Appli de Léna — Menu magique 🦄</title>
+<meta name="theme-color" content="#b06fff"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;900&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Paleta suavizada (más pastel) */
+  --bg:#f7f5ff; --bg2:#eeebff; --card:rgba(255,255,255,.95); --cardHi:rgba(255,255,255,.9);
+  /* Más contraste en pantallas Samsung/iPad: tinta más oscura y muted más legible */
+  --ink:#231a3d; --muted:#534a6a;
+  --p1:#a78bfa; --p2:#fecdd3; --p3:#a7f3d;
+  /* Colores primarios y de estado */
+  --primary: #9466ff;
+  --primary-light: #b06fff;
+  --success: #66bb6a;
+  --warning: #ffb74d;
+  --danger: #ef5350;
+  --highlight: #ffee58;
+  /* Espaciado y tipografía */
+  --space-unit: 1rem;
+  --font-heading: 'Fredoka', sans-serif;
+  --font-body: 'Nunito', sans-serif;
+  --font-size-base: 1rem;
+  --font-size-large: 1.5rem;
+  --font-size-xl: 2rem;
+  --font-size-xxl: 3rem;
+  /* Sombra */
+  --shadow-small: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-medium: 0 10px 15px rgba(0,0,0,0.15);
+  --shadow-large: 0 20px 25px rgba(0,0,0,0.2);
+}
+/* Estilos generales */
+* { box-sizing: border-box; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-unit);
+  line-height: 1.6;
+  font-size: var(--font-size-base);
+}
+#stageTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  padding: var(--space-unit);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-large);
+  color: var(--primary);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#stageTop .scores-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+#stageTop span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: var(--card);
+  box-shadow: var(--shadow-small);
+}
+#stageTop span::before {
+  content: '⭐️';
+  font-size: 1.25em;
+}
+#stageTop span.coins::before {
+  content: '💰';
+}
+#stageTop span.level::before {
+  content: '🚀';
+}
+#stageTop .topic-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+.topic-btn {
+    font-family: var(--font-heading);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    border: 2px solid var(--primary-light);
+    background: var(--bg2);
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.topic-btn:hover {
+    background: var(--primary-light);
+    color: white;
+}
+.topic-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: var(--shadow-small);
+}
+#stageBottom {
+  width: 100%;
+  max-width: 800px;
+  background: var(--card);
+  border-radius: 1.5rem;
+  padding: calc(var(--space-unit) * 2);
+  box-shadow: var(--shadow-large);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-unit);
+}
+#stageBottom::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, var(--p1) 0%, transparent 70%);
+  opacity: 0.1;
+  animation: bg-pulse 10s infinite alternate;
+}
+@keyframes bg-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+#content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-unit);
+}
+.question-prompt {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  color: var(--ink);
+  margin-bottom: var(--space-unit);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-unit);
+  width: 100%;
+}
+.option {
+  font-family: var(--font-body);
+  font-size: var(--font-size-large);
+  padding: var(--space-unit);
+  border-radius: 1rem;
+  background: var(--bg2);
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: var(--shadow-small);
+  text-align: center;
+}
+.option:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--primary-light);
+}
+.option.selected {
+  transform: scale(1.05);
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-medium);
+}
+.option.correct {
+  transform: scale(1.1);
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+.option.wrong {
+  transform: scale(0.95);
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+.prompt {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-large);
+  margin-top: var(--space-unit);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  width: fit-content;
+  align-self: center;
+}
+.prompt.ok {
+  background-color: var(--success);
+  color: white;
+}
+.prompt.bad {
+  background-color: var(--danger);
+  color: white;
+}
+.explanation {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  margin-top: 0.5rem;
+  color: var(--muted);
+}
+#stageBtns {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-unit);
+  margin-top: calc(var(--space-unit) * 2);
+  width: 100%;
+}
+.btn {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-large);
+  padding: 0.75rem 2rem;
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-small);
+  transition: all 0.2s ease-in-out;
+  flex-grow: 1;
+  max-width: 200px;
+}
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-medium);
+}
+#btnPrev {
+  background: var(--muted);
+  color: white;
+}
+#btnSkip {
+  background: var(--primary-light);
+  color: white;
+}
+/* Animaciones y efectos */
+.fx-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+.fx-pop { animation: pop 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) both; }
+.fx-glow { animation: glow 1.5s infinite alternate; }
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+@keyframes pop {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+@keyframes glow {
+  from { box-shadow: 0 0 5px var(--success); }
+  to { box-shadow: 0 0 20px var(--success), 0 0 30px var(--success); }
+}
+@media (max-width: 768px) {
+  #stageBottom { padding: var(--space-unit); }
+  .btn { padding: 0.75rem 1.5rem; font-size: 1rem; }
+  .question-prompt { font-size: 1.5rem; }
+  .options-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div id="stageTop">
+    <div class="scores-container">
+      <span id="scoreStars">0</span>
+      <span id="scoreCoins" class="coins">0</span>
+      <span id="level" class="level">Niveau 1</span>
+    </div>
+    <div class="topic-buttons">
+        <button id="btn-additions" class="topic-btn" data-topic="additions">Additions</button>
+        <button id="btn-soustractions" class="topic-btn" data-topic="soustractions">Soustractions</button>
+        <button id="btn-multiplications" class="topic-btn" data-topic="multiplications">Multiplications (Tables 1-12)</button>
+    </div>
+  </div>
+
+  <div id="stageBottom">
+    <div id="content">
+      </div>
+    
+    <div id="stageBtns">
+      <button id="btnPrev" class="btn">Précédent</button>
+      <button id="btnSkip" class="btn">Passer</button>
+    </div>
+  </div>
+
+  <script>
+    // Configuration des niveaux et des questions par niveau
+    const LEVELS_PER_TOPIC = 10;
+    const QUESTIONS_PER_LEVEL = 5;
+
+    // Base de données de questions générées
+    const allQuestions = {
+        additions: [],
+        soustractions: [],
+        multiplications: []
+    };
+
+    // Générateur de questions
+    function generateAdditionQuestion(difficulty) {
+        let max = difficulty * 5 + 5;
+        let num1 = Math.floor(Math.random() * max) + 1;
+        let num2 = Math.floor(Math.random() * (max - num1) + 1);
+        let correct = num1 + num2;
+        let options = [correct];
+        while (options.length < 3) {
+            let fakeOption = Math.floor(Math.random() * 20) + 1;
+            if (options.indexOf(fakeOption) === -1 && Math.abs(fakeOption - correct) > 1) {
+                options.push(fakeOption);
+            }
+        }
+        options.sort(() => Math.random() - 0.5);
+        return {
+            question: `Combien font ${num1} + ${num2}?`,
+            options: options,
+            correct: options.indexOf(correct),
+            difficulty: difficulty,
+            reward: { stars: difficulty * 10, coins: difficulty * 5 },
+            explanation: `${num1} + ${num2} = ${correct}`
+        };
+    }
+    
+    function generateSubtractionQuestion(difficulty) {
+        let max = difficulty * 5 + 10;
+        let min = difficulty;
+        let num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+        let num2 = Math.floor(Math.random() * (num1 - min + 1)) + min;
+        let correct = num1 - num2;
+        let options = [correct];
+        while (options.length < 3) {
+            let fakeOption = Math.floor(Math.random() * 20);
+            if (options.indexOf(fakeOption) === -1 && Math.abs(fakeOption - correct) > 1) {
+                options.push(fakeOption);
+            }
+        }
+        options.sort(() => Math.random() - 0.5);
+        return {
+            question: `Combien font ${num1} - ${num2}?`,
+            options: options,
+            correct: options.indexOf(correct),
+            difficulty: difficulty,
+            reward: { stars: difficulty * 10, coins: difficulty * 5 },
+            explanation: `${num1} - ${num2} = ${correct}`
+        };
+    }
+
+    function generateMultiplicationQuestion(difficulty) {
+        let table = difficulty;
+        let maxFactor = 12;
+        let num1 = Math.floor(Math.random() * maxFactor) + 1;
+        let num2 = Math.floor(Math.random() * maxFactor) + 1;
+        let correct = num1 * num2;
+        let options = [correct];
+        while (options.length < 3) {
+            let fakeOption = Math.floor(Math.random() * 144) + 1;
+            if (options.indexOf(fakeOption) === -1 && Math.abs(fakeOption - correct) > 1) {
+                options.push(fakeOption);
+            }
+        }
+        options.sort(() => Math.random() - 0.5);
+        return {
+            question: `Combien font ${num1} x ${num2}?`,
+            options: options,
+            correct: options.indexOf(correct),
+            difficulty: difficulty,
+            reward: { stars: difficulty * 15, coins: difficulty * 10 },
+            explanation: `${num1} x ${num2} = ${correct}`
+        };
+    }
+
+    // Remplir la base de données de questions
+    function initializeQuestions() {
+        for (let level = 1; level <= LEVELS_PER_TOPIC; level++) {
+            for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) {
+                allQuestions.additions.push(generateAdditionQuestion(level));
+                allQuestions.soustractions.push(generateSubtractionQuestion(level));
+                allQuestions.multiplications.push(generateMultiplicationQuestion(level));
+            }
+        }
+    }
+
+    // Initialiser les questions au chargement
+    initializeQuestions();
+
+    const content = document.getElementById('content');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnSkip = document.getElementById('btnSkip');
+    const scoreStars = document.getElementById('scoreStars');
+    const scoreCoins = document.getElementById('scoreCoins');
+    const levelDisplay = document.getElementById('level');
+    const topicButtons = document.querySelectorAll('.topic-btn');
+    
+    let currentTopic = '';
+    let currentLevel = 1;
+    let currentQuestionIndex = 0;
+    let userScore = { stars: 0, coins: 0 };
+    let answeredQuestions = {}; // Pour suivre les niveaux complétés
+
+    function updateUI() {
+        scoreStars.textContent = userScore.stars;
+        scoreCoins.textContent = userScore.coins;
+        levelDisplay.textContent = `Niveau ${currentLevel}`;
+        btnPrev.style.display = 'none';
+        btnSkip.style.display = 'none';
+    }
+
+    function showTopicMenu() {
+        while (content.firstChild) {
+            content.removeChild(content.firstChild);
+        }
+        const prompt = document.createElement('div');
+        prompt.className = 'question-prompt';
+        prompt.textContent = 'Sélectionne un sujet mathématique pour commencer.';
+        content.appendChild(prompt);
+        btnPrev.style.display = 'none';
+        btnSkip.style.display = 'none';
+    }
+
+    function showLevelMenu(topic) {
+        currentTopic = topic;
+        while (content.firstChild) {
+            content.removeChild(content.firstChild);
+        }
+        const fragment = document.createDocumentFragment();
+        const title = document.createElement('div');
+        title.className = 'question-prompt';
+        title.textContent = `Choisis un niveau pour ${topic}`;
+        fragment.appendChild(title);
+
+        const levelsContainer = document.createElement('div');
+        levelsContainer.className = 'options-grid';
+
+        for (let i = 1; i <= LEVELS_PER_TOPIC; i++) {
+            const levelBtn = document.createElement('div');
+            levelBtn.className = 'option level-btn';
+            levelBtn.textContent = `Niveau ${i}`;
+            levelBtn.dataset.level = i;
+
+            if (answeredQuestions[`${topic}-${i}`] === 'completed') {
+                levelBtn.classList.add('correct');
+            }
+
+            levelBtn.addEventListener('click', () => {
+                currentLevel = i;
+                loadQuestion(0);
+            });
+            levelsContainer.appendChild(levelBtn);
+        }
+        fragment.appendChild(levelsContainer);
+        content.appendChild(fragment);
+    }
+    
+    function handleOptionClick(event) {
+        const selected = event.target;
+        const options = document.querySelectorAll('.option');
+        options.forEach(opt => opt.removeEventListener('click', handleOptionClick));
+        
+        const questionData = allQuestions[currentTopic].filter(q => q.difficulty === currentLevel)[currentQuestionIndex];
+        const userAnswer = parseInt(selected.dataset.index, 10);
+        const correctAnswerIndex = questionData.correct;
+
+        if (userAnswer === correctAnswerIndex) {
+            selected.classList.add('correct', 'fx-pop');
+            const promptEl = document.createElement('div');
+            promptEl.className = 'prompt ok fx-glow';
+            promptEl.textContent = '✅ Bravo ! Bonne réponse.';
+            content.appendChild(promptEl);
+            userScore.stars += questionData.reward.stars;
+            userScore.coins += questionData.reward.coins;
+        } else {
+            selected.classList.add('wrong', 'fx-shake');
+            userScore.coins = Math.max(0, userScore.coins - 3);
+            const correctOption = document.querySelector(`.option[data-index="${correctAnswerIndex}"]`);
+            if (correctOption) {
+                correctOption.classList.add('correct', 'fx-pop');
+            }
+            const promptEl = document.createElement('div');
+            promptEl.className = 'prompt bad fx-shake';
+            promptEl.innerHTML = `❌ Réponse incorrecte. La bonne réponse est : ${questionData.options[correctAnswerIndex]}<br><div class="explanation">${questionData.explanation}</div>`;
+            content.appendChild(promptEl);
+        }
+        updateUI();
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < QUESTIONS_PER_LEVEL) {
+                loadQuestion(currentQuestionIndex);
+            } else {
+                answeredQuestions[`${currentTopic}-${currentLevel}`] = 'completed';
+                const winPrompt = document.createElement('div');
+                winPrompt.className = 'prompt ok';
+                winPrompt.textContent = `Bravo, tu as complété le Niveau ${currentLevel} !`;
+                content.appendChild(winPrompt);
+                setTimeout(() => showLevelMenu(currentTopic), 2000);
+            }
+        }, 2500);
+    }
+
+    function loadQuestion(index) {
+        currentQuestionIndex = index;
+        while (content.firstChild) {
+            content.removeChild(content.firstChild);
+        }
+        
+        const questionsForLevel = allQuestions[currentTopic].filter(q => q.difficulty === currentLevel);
+        const questionData = questionsForLevel[index];
+        const fragment = document.createDocumentFragment();
+
+        const title = document.createElement('div');
+        title.className = 'question-prompt';
+        title.textContent = questionData.question;
+        fragment.appendChild(title);
+
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'options-grid';
+        
+        const shuffledOptions = shuffle([...questionData.options]);
+        shuffledOptions.forEach((opt, i) => {
+            const optionEl = document.createElement('div');
+            optionEl.className = 'option';
+            optionEl.textContent = opt;
+            const originalIndex = questionData.options.indexOf(opt);
+            optionEl.dataset.index = originalIndex;
+            optionEl.addEventListener('click', handleOptionClick);
+            optionsContainer.appendChild(optionEl);
+        });
+        fragment.appendChild(optionsContainer);
+        content.appendChild(fragment);
+
+        updateUI();
+    }
+    
+    function win() {
+        content.innerHTML = `<div class="question-prompt">Tu as complété toutes les questions! 🎉</div>
+                            <div class="prompt ok">Ton score final : ${userScore.stars} étoiles et ${userScore.coins} pièces.</div>
+                            <div class="prompt bad">Merci d'avoir joué!</div>`;
+        btnPrev.style.display = 'none';
+        btnSkip.style.display = 'none';
+    }
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    topicButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            topicButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            showLevelMenu(btn.dataset.topic);
+        });
+    });
+
+    btnPrev.addEventListener('click', () => {
+        // Esta función podría ser modificada para volver al menú de niveles
+        showTopicMenu();
+    });
+
+    btnSkip.addEventListener('click', () => {
+        // No aplicable en este modo de juego, lo mantengo oculto
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showTopicMenu();
+    });
+
+  </script>
+</body>
+</html>
