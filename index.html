@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -344,6 +343,43 @@ body {
 .fx-glow { animation: glow 1.5s infinite alternate; }
 .fx-pop-out { animation: pop-out 0.5s forwards; }
 .fx-bounce-menu { animation: bounceIn 0.5s ease-out; }
+
+/* NUEVAS ANIMACIONES */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes bounceInDown {
+  from,
+  60%,
+  75%,
+  90%,
+  to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -3000px, 0) scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(0, 25px, 0) scale(1);
+  }
+  75% {
+    transform: translate3d(0, -10px, 0);
+  }
+  90% {
+    transform: translate3d(0, 5px, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.fx-pulse { animation: pulse 2s infinite ease-in-out; }
+.fx-bounce-in-down { animation: bounceInDown 1s both; }
 
 @keyframes shake {
   10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -789,7 +825,7 @@ body {
     
     function showSuccessMessage(message = positiveMessages[Math.floor(Math.random() * positiveMessages.length)]) {
         const promptEl = document.createElement('div');
-        promptEl.className = 'prompt ok';
+        promptEl.className = 'prompt ok fx-pop';
         promptEl.textContent = message;
         content.appendChild(promptEl);
         speakText(message);
@@ -912,7 +948,7 @@ body {
     function showTopicMenu() {
         content.innerHTML = '';
         const prompt = document.createElement('div');
-        prompt.className = 'question-prompt fx-bounce-menu';
+        prompt.className = 'question-prompt fx-bounce-in-down';
         prompt.textContent = 'Sélectionne un sujet pour commencer.';
         content.appendChild(prompt);
         speakText('Sélectionne un sujet pour commencer.');
@@ -932,9 +968,10 @@ body {
 
         allTopics.forEach(topic => {
             const btn = document.createElement('button');
-            btn.className = 'topic-btn';
+            btn.className = 'topic-btn fx-bounce-in-down';
             btn.innerHTML = topic.text;
             btn.dataset.topic = topic.id;
+            btn.style.animationDelay = `${Math.random() * 0.5}s`;
             btn.addEventListener('click', () => {
                 currentTopic = topic.id;
                 if (topic.id === 'stories') { showStoryMenu(); }
@@ -953,7 +990,7 @@ body {
         currentTopic = topic;
         content.innerHTML = '';
         const title = document.createElement('div');
-        title.className = 'question-prompt';
+        title.className = 'question-prompt fx-bounce-in-down';
         title.textContent = `Choisis un niveau pour ${topic}`;
         content.appendChild(title);
         speakText(`Choisis un niveau pour ${topic}`);
@@ -963,8 +1000,9 @@ body {
 
         for (let i = 1; i <= LEVELS_PER_TOPIC; i++) {
             const levelBtn = document.createElement('div');
-            levelBtn.className = 'option level-btn';
+            levelBtn.className = 'option level-btn fx-bounce-in-down';
             levelBtn.textContent = `Niveau ${i}`;
+            levelBtn.style.animationDelay = `${Math.random() * 0.5}s`;
             if (answeredQuestions[`${currentTopic}-${i}`] === 'completed') {
                 levelBtn.classList.add('correct');
             }
@@ -1017,7 +1055,7 @@ body {
             } else {
                 answeredQuestions[`${currentTopic}-${currentLevel}`] = 'completed';
                 const winPrompt = document.createElement('div');
-                winPrompt.className = 'prompt ok';
+                winPrompt.className = 'prompt ok fx-pop';
                 winPrompt.textContent = `Bravo, tu as complété le Niveau ${currentLevel} !`;
                 content.appendChild(winPrompt);
                 speakText(`Bravo, tu as complété le Niveau ${currentLevel} !`);
@@ -1036,7 +1074,7 @@ body {
         const fragment = document.createDocumentFragment();
 
         const title = document.createElement('div');
-        title.className = 'question-prompt';
+        title.className = 'question-prompt fx-bounce-in-down';
         title.innerHTML = questionData.questionText;
         fragment.appendChild(title);
         speakText(questionData.questionText);
@@ -1047,8 +1085,9 @@ body {
         const shuffledOptions = shuffle([...questionData.options]);
         shuffledOptions.forEach((opt, i) => {
             const optionEl = document.createElement('div');
-            optionEl.className = 'option';
+            optionEl.className = 'option fx-bounce-in-down';
             optionEl.innerHTML = opt;
+            optionEl.style.animationDelay = `${i * 0.1 + 0.5}s`;
             const originalIndex = questionData.options.indexOf(opt);
             optionEl.dataset.index = originalIndex;
             optionEl.addEventListener('click', handleOptionClick);
@@ -1062,48 +1101,50 @@ body {
         btnBack.onclick = () => showLevelMenu(currentTopic);
     }
     /* === Juegos Específicos === */
-
-/**
+    /**
  * Muestra el juego de las Casas de los Números.
  * @param {number} level El nivel actual del juego.
  */
 function showNumberHousesGame(level) {
     currentLevel = level;
-    // Limpiar el contenido del contenedor principal para evitar duplicados.
     const content = document.getElementById('content');
     content.innerHTML = ''; 
     updateUI();
 
-    const roofNumber = level + 10;
-    const pairs = generateNumberPairs(roofNumber, HOUSE_PAIRS_PER_LEVEL);
+    const maxRoofNumber = (level * 5) + 15;
+    const roofNumber = Math.floor(Math.random() * (maxRoofNumber - 10)) + 10;
+    const pairsCount = Math.min(10, level * 2 + 5); 
+    const pairs = generateNumberPairs(roofNumber, pairsCount);
 
-    // Crear el contenedor principal del juego.
     const container = document.createElement('div');
-    container.className = 'number-house-container';
+    container.className = 'number-house-container fx-bounce-in-down';
 
-    // Crear y añadir el techo de la casa.
     const rooftop = document.createElement('div');
-    rooftop.className = 'rooftop';
+    rooftop.className = 'rooftop fx-pulse';
     rooftop.textContent = roofNumber;
     container.appendChild(rooftop);
 
-    // Crear y añadir el texto de instrucción.
     const instruction = document.createElement('p');
-    instruction.textContent = 'Complète les maisons des nombres.';
+    instruction.className = 'question-prompt';
+    instruction.textContent = `Completa las ${pairsCount} casas de los números para llegar a ${roofNumber}.`;
     container.appendChild(instruction);
+    speakText(instruction.textContent);
 
-    // Crear el contenedor de las ventanas.
     const windowsContainer = document.createElement('div');
     windowsContainer.className = 'windows';
 
-    // Generar y añadir cada fila de ventanas dinámicamente.
-    pairs.forEach(pair => {
+    pairs.forEach((pair, index) => {
         const row = document.createElement('div');
         row.className = 'window-row';
+        const isFirstHidden = Math.random() < 0.5;
+        const firstNum = isFirstHidden ? '' : pair[0];
+        const secondNum = isFirstHidden ? pair[1] : '';
+        const correctValue = isFirstHidden ? pair[0] : pair[1];
+
         row.innerHTML = `
-            <span class="window-number">${pair[0]}</span>
+            ${isFirstHidden ? `<input type="number" class="window-input" data-correct-value="${correctValue}" />` : `<span class="window-number">${firstNum}</span>`}
             <span class="plus-sign">+</span>
-            <input type="number" class="window-input" data-correct-value="${pair[1]}" />
+            ${isFirstHidden ? `<span class="window-number">${secondNum}</span>` : `<input type="number" class="window-input" data-correct-value="${correctValue}" />`}
             <span class="equal-sign">=</span>
             <span class="window-number">${roofNumber}</span>
         `;
@@ -1112,23 +1153,19 @@ function showNumberHousesGame(level) {
 
     container.appendChild(windowsContainer);
 
-    // Crear y añadir el botón de verificación.
     const checkBtn = document.createElement('button');
     checkBtn.id = 'checkHouseBtn';
-    checkBtn.className = 'submit-btn';
-    checkBtn.textContent = 'Vérifier';
-    checkBtn.setAttribute('aria-label', 'Vérifier les réponses');
+    checkBtn.className = 'submit-btn fx-bounce-in-down';
+    checkBtn.textContent = 'Verificar';
+    checkBtn.setAttribute('aria-label', 'Verificar las respuestas');
+    checkBtn.style.animationDelay = `${pairs.length * 0.1 + 0.5}s`;
     container.appendChild(checkBtn);
-
-    // Añadir el contenedor completo al DOM.
     content.appendChild(container);
 
-    // Configurar los botones de navegación.
     btnBack.style.display = 'inline-block';
-    btnBack.textContent = 'Retour aux niveaux';
+    btnBack.textContent = 'Volver a los niveles';
     btnBack.onclick = () => showLevelMenu(currentTopic);
 
-    // Asignar el evento al botón de verificación.
     checkBtn.addEventListener('click', handleCheckHouses);
 }
 
@@ -1141,15 +1178,12 @@ function handleCheckHouses() {
     let correctCount = 0;
     const checkBtn = document.getElementById('checkHouseBtn');
 
-    // Deshabilitar el botón temporalmente para evitar clics múltiples.
     checkBtn.disabled = true;
 
-    // Iterar sobre todos los inputs.
     allInputs.forEach(input => {
         const inputValue = parseInt(input.value, 10);
         const correctValue = parseInt(input.dataset.correctValue, 10);
         
-        // Limpiar clases de estado previas.
         input.classList.remove('correct', 'incorrect', 'fx-shake');
 
         if (inputValue === correctValue) {
@@ -1166,14 +1200,13 @@ function handleCheckHouses() {
 
     updateUI();
 
-    // Lógica al completar el nivel.
     if (allCorrect) {
         userScore.stars += 50;
         userScore.coins += 50;
         answeredQuestions[`${currentTopic}-${currentLevel}`] = 'completed';
-        showSuccessMessage('Bravo 🦄✨ !');
+        showSuccessMessage('¡Bravo! Todas las casas están correctas. 🦄✨');
         showConfetti();
-        checkBtn.textContent = 'Niveau suivant';
+        checkBtn.textContent = 'Siguiente nivel';
         checkBtn.onclick = () => {
             if (currentLevel < LEVELS_PER_TOPIC) {
                 showNumberHousesGame(currentLevel + 1);
@@ -1181,27 +1214,37 @@ function handleCheckHouses() {
                 win();
             }
         };
-        // Habilitar el botón para el siguiente nivel.
         checkBtn.disabled = false;
     } else {
-        showErrorMessage(`${correctCount} bonnes réponses. -5 pièces.`);
-        // Volver a habilitar el botón después de un pequeño retraso.
+        const message = `${correctCount} respuestas correctas. ${allInputs.length - correctCount} incorrectas. -5 monedas.`;
+        showErrorMessage(message);
         setTimeout(() => checkBtn.disabled = false, 500); 
     }
 }
 
-    function generateNumberPairs(sum, count) {
-        const pairs = new Set();
-        while (pairs.size < count) {
-            const num1 = Math.floor(Math.random() * (sum));
-            const num2 = sum - num1;
-            if (num1 >= 0 && num2 >= 0) {
-                const pairString = [num1, num2].sort((a, b) => a - b).join('-');
-                pairs.add(pairString);
-            }
+/**
+ * Genera pares de números cuya suma es igual a 'sum'.
+ * @param {number} sum El valor del tejado de la casa.
+ * @param {number} count La cantidad de pares a generar.
+ * @returns {Array<Array<number>>} Un array de pares de números.
+ */
+function generateNumberPairs(sum, count) {
+    const pairs = [];
+    const usedPairs = new Set(); 
+
+    while (pairs.length < count) {
+        const num1 = Math.floor(Math.random() * (sum + 1)); 
+        const num2 = sum - num1;
+        
+        const pairKey = num1 < num2 ? `${num1}-${num2}` : `${num2}-${num1}`;
+
+        if (!usedPairs.has(pairKey)) {
+            pairs.push([num1, num2]);
+            usedPairs.add(pairKey);
         }
-        return Array.from(pairs).map(pair => pair.split('-').map(Number)).map(pair => shuffle(pair));
     }
+    return pairs;
+}
 
     function showColorGame(level) {
         currentTopic = 'colors';
@@ -1220,7 +1263,7 @@ function handleCheckHouses() {
         const fragment = document.createDocumentFragment();
         
         const title = document.createElement('div');
-        title.className = 'question-prompt';
+        title.className = 'question-prompt fx-bounce-in-down';
         title.innerHTML = questionData.questionText;
         fragment.appendChild(title);
         speakText(questionData.questionText);
@@ -1231,7 +1274,8 @@ function handleCheckHouses() {
         const shuffledOptions = shuffle([...questionData.options]);
         shuffledOptions.forEach((opt, i) => {
             const optionEl = document.createElement('button');
-            optionEl.className = 'color-option-button';
+            optionEl.className = 'color-option-button fx-bounce-in-down';
+            optionEl.style.animationDelay = `${i * 0.1 + 0.5}s`;
             const colorName = colorMap[opt];
             if (colorName) { optionEl.classList.add(`color-${colorName}`); }
             optionEl.innerHTML = opt;
@@ -1287,7 +1331,7 @@ function handleCheckHouses() {
     function showStoryMenu() {
         content.innerHTML = '';
         const title = document.createElement('div');
-        title.className = 'question-prompt';
+        title.className = 'question-prompt fx-bounce-in-down';
         title.textContent = 'Choisis un conte magique ✨';
         content.appendChild(title);
         speakText('Choisis un conte magique');
@@ -1297,7 +1341,8 @@ function handleCheckHouses() {
         
         magicStories.forEach((story, index) => {
             const storyBtn = document.createElement('button');
-            storyBtn.className = 'topic-btn';
+            storyBtn.className = 'topic-btn fx-bounce-in-down';
+            storyBtn.style.animationDelay = `${index * 0.1}s`;
             storyBtn.innerHTML = `📚 ${story.title}`;
             storyBtn.addEventListener('click', () => showMagicStory(index));
             storiesContainer.appendChild(storyBtn);
@@ -1313,7 +1358,7 @@ function handleCheckHouses() {
         content.innerHTML = '';
         const story = magicStories[storyIndex];
         const storyContainer = document.createElement('div');
-        storyContainer.className = 'story-container';
+        storyContainer.className = 'story-container fx-bounce-in-down';
         storyContainer.innerHTML = `<h2>${story.title}</h2><img src="${story.image}" alt="${story.title}" />`;
         
         story.text.forEach(paragraph => {
@@ -1333,7 +1378,7 @@ function handleCheckHouses() {
         }
 
         const startQuizBtn = document.createElement('button');
-        startQuizBtn.className = 'btn submit-btn';
+        startQuizBtn.className = 'btn submit-btn fx-bounce-in-down';
         startQuizBtn.textContent = 'Commencer le quiz';
         startQuizBtn.style.marginTop = '2rem';
         startQuizBtn.addEventListener('click', () => startStoryQuiz(story.quiz));
@@ -1366,7 +1411,7 @@ function handleCheckHouses() {
         const fragment = document.createDocumentFragment();
         
         const title = document.createElement('div');
-        title.className = 'question-prompt';
+        title.className = 'question-prompt fx-bounce-in-down';
         title.innerHTML = `Question ${currentQuestionIndex + 1}:<br>${questionData.question}`;
         fragment.appendChild(title);
         speakText(questionData.question);
@@ -1377,7 +1422,8 @@ function handleCheckHouses() {
         const shuffledOptions = shuffle([...questionData.options]);
         shuffledOptions.forEach((opt, i) => {
             const optionEl = document.createElement('button');
-            optionEl.className = 'option';
+            optionEl.className = 'option fx-bounce-in-down';
+            optionEl.style.animationDelay = `${i * 0.1 + 0.5}s`;
             optionEl.innerHTML = opt;
             const originalIndex = questionData.options.indexOf(opt);
             optionEl.dataset.index = originalIndex;
@@ -1425,11 +1471,11 @@ function handleCheckHouses() {
     
     function showQuizResults() {
         content.innerHTML = `
-            <div class="prompt ok">
+            <div class="prompt ok fx-pop">
                 Quiz terminé ! 🎉
                 <p>Tu as gagné des étoiles et des pièces !</p>
             </div>
-            <button class="btn submit-btn" onclick="showStoryMenu()">Retourner aux contes</button>
+            <button class="btn submit-btn fx-bounce-in-down" onclick="showStoryMenu()">Retourner aux contes</button>
         `;
         speakText('Quiz terminé ! Bravo !');
         btnBack.textContent = 'Retourner au Menu Principal';
@@ -1439,12 +1485,12 @@ function handleCheckHouses() {
 
     function showMemoryGameMenu() {
       content.innerHTML = `
-        <div class="question-prompt">
+        <div class="question-prompt fx-bounce-in-down">
           Choisis un niveau de mémoire
         </div>
         <div class="options-grid">
           ${MEMORY_GAME_LEVELS.map(level => `
-            <button class="topic-btn" onclick="showMemoryGame(${level.pairs})">
+            <button class="topic-btn fx-bounce-in-down" onclick="showMemoryGame(${level.pairs})" style="animation-delay: ${Math.random() * 0.5}s;">
               Niveau ${level.level}<br>
               ${level.pairs} paires
             </button>
@@ -1459,7 +1505,7 @@ function handleCheckHouses() {
     function showMemoryGame(pairsCount) {
         content.innerHTML = '';
         const title = document.createElement('div');
-        title.className = 'question-prompt';
+        title.className = 'question-prompt fx-bounce-in-down';
         title.textContent = 'Trouve toutes les paires !';
         content.appendChild(title);
         speakText('Trouve toutes les paires !');
@@ -1468,7 +1514,9 @@ function handleCheckHouses() {
         memoryGrid.className = 'memory-grid';
         const levelConfig = MEMORY_GAME_LEVELS.find(l => l.pairs === pairsCount);
         if (levelConfig) {
-          memoryGrid.style.gridTemplateColumns = `repeat(${Math.sqrt(pairsCount*2)}, 1fr)`;
+          // Ajusta el grid basado en la configuración del nivel
+          const gridSize = Math.sqrt(pairsCount * 2);
+          memoryGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
         }
         content.appendChild(memoryGrid);
 
@@ -1480,7 +1528,8 @@ function handleCheckHouses() {
 
         gameCards.forEach((emoji, index) => {
             const card = document.createElement('div');
-            card.className = 'memory-card';
+            card.className = 'memory-card fx-bounce-in-down';
+            card.style.animationDelay = `${index * 0.05}s`;
             card.innerHTML = `<span style="opacity:0;">${emoji}</span>`;
             card.addEventListener('click', () => flipCard(card, emoji, index));
             memoryGrid.appendChild(card);
@@ -1535,7 +1584,7 @@ function handleCheckHouses() {
     }
 
     function win() {
-        content.innerHTML = `<div class="question-prompt">Tu as complété toutes les questions! 🎉</div>
+        content.innerHTML = `<div class="question-prompt fx-pop">Tu as complété toutes les questions! 🎉</div>
                             <div class="prompt ok">Ton score final : ${userScore.stars} étoiles et ${userScore.coins} pièces.</div>`;
         speakText("Tu as complété toutes les questions! Félicitations pour ton score final.");
         btnBack.style.display = 'inline-block';
