@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -554,35 +555,40 @@ body {
 /* Estilos para "Mémoire Magique" */
 .memory-grid {
     display: grid;
-    gap: 10px;
+    /* Aquí se define la estructura de columnas.
+       'repeat(4, 1fr)' crea 4 columnas de igual ancho.
+       Esto se ajustará dinámicamente según el nivel del juego. */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px; /* Espacio entre las cartas */
     width: 100%;
-    max-width: 500px;
+    max-width: 500px; /* Ancho máximo del contenedor del grid */
+    margin: 0 auto; /* Centra el grid en la página */
 }
 .memory-card {
-    background-color: var(--primary);
-    border-radius: 10px;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    cursor: pointer;
-    transform: rotateY(180deg);
-    transition: transform 0.6s;
-    box-shadow: var(--shadow-small);
+    background-color: var(--primary); /* Color de fondo inicial */
+    border-radius: 10px; /* Bordes redondeados */
+    height: 100px; /* Altura fija de la carta */
+    display: grid; /* Utiliza grid para centrar el contenido */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    align-items: center; /* Centra el contenido verticalmente */
+    font-size: 2rem; /* Tamaño de la fuente (si hay contenido visible) */
+    cursor: pointer; /* Cambia el cursor a una mano al pasar sobre la carta */
+    transform: rotateY(180deg); /* Carta inicialmente volteada (oculta) */
+    transition: transform 0.6s; /* Transición suave para el volteo */
+    box-shadow: var(--shadow-small); /* Sombra sutil */
 }
-.memory-card.flipped {
-    transform: rotateY(0deg);
-    background-color: var(--card);
-}
+
+/* Estilos para cartas que han coincidido */
 .memory-card.matched {
-    cursor: default;
-    background-color: var(--success);
-    transition: background-color 0.5s;
-    pointer-events: none;
+    cursor: default; /* Cursor normal para cartas que ya coincidieron */
+    background-color: var(--success); /* Color de fondo indicando coincidencia */
+    transition: background-color 0.5s; /* Transición suave del color */
+    pointer-events: none; /* Deshabilita interacciones sobre cartas coincididas */
 }
+
+/* Estilos para cartas deshabilitadas (durante comparaciones o si ya coincidieron) */
 .memory-card.disabled {
-    pointer-events: none;
+    pointer-events: none; /* Deshabilita cualquier interacción */
 }
 </style>
 </head>
@@ -632,46 +638,93 @@ body {
     // Contenido del juego
     const positiveMessages = ['🦄 Bravo !', '✨ Super !', '🌈 Génial !', '🌟 Parfait !'];
     const magicStories = [
-      {
-          title: "Le Voyage de Léna l'Étoile",
-          image: "https://via.placeholder.com/600x400.png?text=Le+voyage+de+Lena",
-          text: ["Léna était une toute petite étoile, brillante comme un diamant. Elle vivait sur une montagne magique avec sa petite sœur Yaya.", "Un jour, Léna décida de faire un grand voyage pour trouver le plus beau des arcs-en-ciel. Yaya, très curieuse, la rejoignit. Elles sautèrent de nuage en nuage. C'était un jeu très amusant !", "Finalement, elles trouvèrent un arc-en-ciel géant. C'était le plus beau de tous. Mission accomplie ! Léna et Yaya avaient fait un voyage inoubliable."],
-          quiz: [
-            { question: "Qui est Léna ?", options: ["Une princesse", "Une étoile", "Un animal"], correct: 1 },
-            { question: "Où vivait Léna ?", options: ["Dans une forêt", "Sur une montagne magique", "Dans un château"], correct: 1 },
-            { question: "Qu'ont-elles trouvé à la fin de leur voyage ?", options: ["Une fleur", "Un trésor", "Un arc-en-ciel"], correct: 2 }
-          ]
-      },
-      {
-          title: "Le Lion au Grand Coeur",
-          image: "https://via.placeholder.com/600x400.png?text=Le+lion+au+grand+coeur",
-          text: ["Dans la savane vivait un lion nommé Léo. Il n'était pas le plus fort, mais il était le plus courageux et le plus gentil. Léna et Yaya étaient ses meilleures amies.", "Un jour, une petite antilope se retrouva coincée dans un marécage. Léna et Yaya étaient inquiètes. Léo, sans hésiter, sauta dans la boue pour la sauver.", "Les autres animaux applaudirent. Léo avait montré que le courage ne se mesure pas à la force, mais à la gentillesse. Léna et Yaya étaient si fières de leur ami."],
-          quiz: [
-            { question: "Comment s'appelle le lion ?", options: ["Léo", "Max", "Simba"], correct: 0 },
-            { question: "Qu'est-ce qui le rendait courageux ?", options: ["Sa force", "Sa gentillesse", "Sa vitesse"], correct: 1 },
-            { question: "Quel animal Léo a-t-il sauvé ?", options: ["Un zèbre", "Une antilope", "Une girafe"], correct: 1 }
-          ]
-      },
-      {
-          title: "Le Petit Nuage Heureux",
-          image: "https://via.placeholder.com/600x400.png?text=Le+petit+nuage+heureux",
-          text: ["C'était une journée triste. Le soleil était caché derrière de gros nuages gris. Léna et Yaya cherchaient des couleurs. Mais parmi eux, il y avait un petit nuage blanc et joyeux nommé Fluffy. Fluffy voulait rendre les enfants heureux.", "Il vit une petite fille qui pleurait car elle n'avait pas de parapluie. Fluffy décida de se transformer en un arc-en-ciel. Il s'étira et changea de couleurs, illuminant le ciel. Léna et Yaya étaient émerveillées !", "La petite fille leva les yeux, sourit et se mit à rire. Fluffy était si fier. Il avait compris que partager sa joie était la plus belle des choses, et Léna et Yaya l'avaient aidé en partageant leur bonheur."],
-          quiz: [
-            { question: "Comment s'appelle le petit nuage ?", options: ["Fluffy", "Coco", "Grisou"], correct: 0 },
-            { question: "En quoi s'est-il transformé ?", options: ["Un éclair", "Un arc-en-ciel", "De la pluie"], correct: 1 },
-            { question: "Quelle leçon a-t-il apprise ?", options: ["Être triste", "Partager sa joie", "Rester immobile"], correct: 1 }
-          ]
-      },
-      {
-          title: "Le Chêne et la Fée",
-          image: "https://via.placeholder.com/600x400.png?text=Le+chene+et+la+fee",
-          text: ["Dans une forêt ancienne vivait un vieux chêne sage. Léna, la jeune fée, voulait devenir la gardienne de la forêt. Yaya, sa petite sœur, voulait l'aider. Le chêne leur enseigna les secrets de la nature, un par un.", "Chaque jour, Léna et Yaya étudiaient les plantes, les rivières et les animaux. C'était difficile et long. Parfois, elles voulaient abandonner. Mais le chêne leur dit: 'La connaissance ne se cueille pas, elle se cultive. Soyez patientes.'", "Des années plus tard, Léna devint la fée la plus sage de la forêt. Elle avait compris que l'étude et la patience étaient les clés pour atteindre ses rêves. Yaya était sa meilleure alliée. Leur amour pour la forêt était leur plus grande force."],
-          quiz: [
-            { question: "Qui est Léna ?", options: ["Un chêne", "Une fée", "Une princesse"], correct: 1 },
-            { question: "Qui leur a enseigné les secrets de la nature ?", options: ["Le vieux chêne", "Un oiseau", "Le vent"], correct: 0 },
-            { question: "Quelle a été leur plus grande leçon ?", options: ["La force et la rapidité", "La connaissance et la patience", "La magie et la colère"], correct: 1 }
-          ]
-      }
+    
+  {
+    "title": "Le Voyage de Léna l'Étoile ⭐️",
+    "image": "https://photos.app.goo.gl/fkh9KiXZNouPpshj7",
+    "text": [
+      "Léna 👧 était une petite étoile ⭐️ brillante ✨ comme un diamant 💎.",
+      "Elle vivait 🏡 sur une montagne ⛰️ magique ✨ avec sa petite sœur Yaya 👧.",
+      "Un jour ☀️, Léna ⭐️ décida 🗺️ de faire un grand voyage 🚀 pour trouver 🔍 le plus beau arc-en-ciel 🌈.",
+      "Yaya 👧, très curieuse 👀, la rejoignit 🤝.",
+      "Elles sautèrent 🤸 de nuage ☁️ en nuage ☁️. C'était un jeu 🎲 très amusant 😄 !",
+      "Finalement 🎉, elles trouvèrent 🔎 un arc-en-ciel 🌈 géant 🏞️. Mission accomplie 🏆 !",
+      "Léna ⭐️ et Yaya 👧 avaient fait un voyage 🚀 inoubliable 💖."
+    ],
+    "quiz": [
+      { "question": "Qui est Léna 👧 ?", "options": ["Une princesse 👑", "Une étoile ⭐️", "Un animal 🐾"], "correct": 1 },
+      { "question": "Où vivait Léna ⭐️ ?", "options": ["Dans une forêt 🌳", "Sur une montagne magique ⛰️✨", "Dans un château 🏰"], "correct": 1 },
+      { "question": "Qu'ont-elles trouvé 🔍 ?", "options": ["Une fleur 🌸", "Un trésor 💰", "Un arc-en-ciel 🌈"], "correct": 2 }
+    ]
+  },
+  {
+    "title": "Le Lion au Grand Coeur 🦁💖",
+    "image": "https://via.placeholder.com/600x400.png?text=Le+lion+au+grand+coeur",
+    "text": [
+      "Dans la savane 🌍 vivait un lion 🦁 nommé Léo.",
+      "Il n'était pas le plus fort 💪, mais il était le plus courageux 💖 et le plus gentil 🤗.",
+      "Léna 👧 et Yaya 👧 étaient ses meilleures amies 👭.",
+      "Un jour ☀️, une petite antilope 🦌 se retrouva coincée 😨 dans un marécage 🪵.",
+      "Léna 👧 et Yaya 👧 étaient inquiètes 😟.",
+      "Léo 🦁, sans hésiter ⚡, sauta 🤾 dans la boue 🌿 pour la sauver 🙌.",
+      "Les autres animaux 🐒🦓🐘 applaudirent 👏.",
+      "Léo 🦁 avait montré que le courage 💖 ne se mesure pas à la force 💪, mais à la gentillesse 🤗.",
+      "Léna 👧 et Yaya 👧 étaient si fières 🌟 de leur ami 🦁."
+    ],
+    "quiz": [
+      { "question": "Comment s'appelle le lion 🦁 ?", "options": ["Léo 🦁", "Max 🐯", "Simba 🐾"], "correct": 0 },
+      { "question": "Qu'est-ce qui le rendait courageux 💖 ?", "options": ["Sa force 💪", "Sa gentillesse 🤗", "Sa vitesse 🏃‍♂️"], "correct": 1 },
+      { "question": "Quel animal 🐾 Léo 🦁 a-t-il sauvé 🙌 ?", "options": ["Un zèbre 🦓", "Une antilope 🦌", "Une girafe 🦒"], "correct": 1 }
+    ]
+  },
+  {
+    "title": "Le Petit Nuage Heureux ☁️😊",
+    "image": "https://via.placeholder.com/600x400.png?text=Le+petit+nuage+heureux",
+    "text": [
+      "C'était une journée 🌧️ triste 😢.",
+      "Le soleil ☀️ était caché derrière de gros nuages ☁️ gris.",
+      "Léna 👧 et Yaya 👧 cherchaient des couleurs 🌈.",
+      "Mais parmi eux, il y avait un petit nuage ☁️ blanc ⚪ et joyeux 😃 nommé Fluffy ☁️.",
+      "Fluffy ☁️ voulait rendre les enfants 👧👦 heureux 😄.",
+      "Il vit une petite fille 👧 qui pleurait 😢 car elle n'avait pas de parapluie ☔.",
+      "Fluffy ☁️ décida de se transformer ✨ en un arc-en-ciel 🌈.",
+      "Il s'étira ➡️ et changea 🔄 de couleurs 🌈, illuminant 💡 le ciel ☀️.",
+      "Léna 👧 et Yaya 👧 étaient émerveillées 😍 !",
+      "La petite fille 👧 leva les yeux 👀, sourit 😄 et se mit à rire 😂.",
+      "Fluffy ☁️ était si fier 🌟.",
+      "Il avait compris que partager 🤝 sa joie 😄 était la plus belle 🌹 des choses.",
+      "Léna 👧 et Yaya 👧 l'avaient aidé en partageant leur bonheur 💖."
+    ],
+    "quiz": [
+      { "question": "Comment s'appelle le petit nuage ☁️ ?", "options": ["Fluffy ☁️", "Coco 🐻", "Grisou 🌫️"], "correct": 0 },
+      { "question": "En quoi s'est-il transformé ✨ ?", "options": ["Un éclair ⚡", "Un arc-en-ciel 🌈", "De la pluie 🌧️"], "correct": 1 },
+      { "question": "Quelle leçon a-t-il apprise 📖 ?", "options": ["Être triste 😢", "Partager sa joie 😄", "Rester immobile 🪨"], "correct": 1 }
+    ]
+  },
+  {
+    "title": "Le Chêne et la Fée 🌳🧚",
+    "image": "https://via.placeholder.com/600x400.png?text=Le+chene+et+la+fee",
+    "text": [
+      "Dans une forêt 🌳 ancienne vivait un vieux chêne 🌳 sage 📚.",
+      "Léna 👧, la jeune fée 🧚, voulait devenir la gardienne 🛡️ de la forêt 🌳.",
+      "Yaya 👧, sa petite sœur 👧, voulait l'aider 🤝.",
+      "Le chêne 🌳 leur enseigna 📖 les secrets 🔑 de la nature 🌿, un par un 1️⃣.",
+      "Chaque jour 📅, Léna 👧 et Yaya 👧 étudiaient 📚 les plantes 🌱, les rivières 🌊 et les animaux 🐿️.",
+      "C'était difficile 😣 et long ⏳.",
+      "Parfois, elles voulaient abandonner 😔.",
+      "Mais le chêne 🌳 leur dit 💬: 'La connaissance 📚 ne se cueille pas 🚫🌸, elle se cultive 🌱.'",
+      "Soyez patientes ⏳.",
+      "Des années plus tard ⌛, Léna 👧 devint la fée 🧚 la plus sage 📖 de la forêt 🌳.",
+      "Elle avait compris que l'étude 📚 et la patience ⏳ étaient les clés 🔑 pour atteindre ses rêves 🌟.",
+      "Yaya 👧 était sa meilleure alliée 🤝.",
+      "Leur amour 💖 pour la forêt 🌳 était leur plus grande force 💪."
+    ],
+    "quiz": [
+      { "question": "Qui est Léna 👧 ?", "options": ["Un chêne 🌳", "Une fée 🧚", "Une princesse 👑"], "correct": 1 },
+      { "question": "Qui leur a enseigné 📖 les secrets de la nature 🌿 ?", "options": ["Le vieux chêne 🌳", "Un oiseau 🐦", "Le vent 🌬️"], "correct": 0 },
+      { "question": "Quelle a été leur plus grande leçon 📖 ?", "options": ["La force 💪 et la rapidité 🏃", "La connaissance 📚 et la patience ⏳", "La magie ✨ et la colère 😡"], "correct": 1 }
+    ]
+  }
     ];
 
     const colorMap = {
@@ -1008,75 +1061,134 @@ body {
         btnBack.textContent = 'Retour aux niveaux';
         btnBack.onclick = () => showLevelMenu(currentTopic);
     }
-    
     /* === Juegos Específicos === */
-    function showNumberHousesGame(level) {
-        currentLevel = level;
-        content.innerHTML = '';
-        updateUI();
-        
-        const roofNumber = level + 10;
-        const pairs = generateNumberPairs(roofNumber, HOUSE_PAIRS_PER_LEVEL);
-        
-        const houseHtml = `
-            <div class="number-house-container">
-                <div class="rooftop">${roofNumber}</div>
-                <p>Complète les maisons des nombres.</p>
-                <div class="windows">
-                    ${pairs.map(pair => `
-                        <div class="window-row">
-                            <span class="window-number">${pair[0]}</span>
-                            <span class="plus-sign">+</span>
-                            <input type="number" class="window-input" data-correct-value="${pair[1]}" />
-                            <span class="equal-sign">=</span>
-                            <span class="window-number">${roofNumber}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                <button id="checkHouseBtn" class="submit-btn" aria-label="Vérifier les réponses">Vérifier</button>
-            </div>
-        `;
-        content.innerHTML = houseHtml;
-        speakText("Complète les maisons des nombres. Écris le résultat.");
-        btnBack.style.display = 'inline-block';
-        btnBack.textContent = 'Retour aux niveaux';
-        btnBack.onclick = () => showLevelMenu(currentTopic);
 
-        document.getElementById('checkHouseBtn').addEventListener('click', () => {
-            const allInputs = document.querySelectorAll('.window-input');
-            let allCorrect = true;
-            let correctCount = 0;
-            
-            allInputs.forEach(input => {
-                const inputValue = parseInt(input.value, 10);
-                const correctValue = parseInt(input.dataset.correctValue, 10);
-                if (inputValue === correctValue) {
-                    input.classList.add('correct');
-                    input.disabled = true;
-                    correctCount++;
-                } else {
-                    input.classList.add('incorrect', 'fx-shake');
-                    setTimeout(() => input.classList.remove('incorrect', 'fx-shake'), 1000);
-                    userScore.coins = Math.max(0, userScore.coins - 5);
-                    allCorrect = false;
-                }
-            });
-            updateUI();
-            if (allCorrect) {
-                userScore.stars += 50; userScore.coins += 50;
-                answeredQuestions[`${currentTopic}-${currentLevel}`] = 'completed';
-                showSuccessMessage('Bravo 🦄✨ !');
-                showConfetti();
-                document.getElementById('checkHouseBtn').textContent = 'Niveau suivant';
-                document.getElementById('checkHouseBtn').onclick = () => {
-                  if (currentLevel < LEVELS_PER_TOPIC) { showNumberHousesGame(currentLevel + 1); }
-                  else { win(); }
-                };
+/**
+ * Muestra el juego de las Casas de los Números.
+ * @param {number} level El nivel actual del juego.
+ */
+function showNumberHousesGame(level) {
+    currentLevel = level;
+    // Limpiar el contenido del contenedor principal para evitar duplicados.
+    const content = document.getElementById('content');
+    content.innerHTML = ''; 
+    updateUI();
+
+    const roofNumber = level + 10;
+    const pairs = generateNumberPairs(roofNumber, HOUSE_PAIRS_PER_LEVEL);
+
+    // Crear el contenedor principal del juego.
+    const container = document.createElement('div');
+    container.className = 'number-house-container';
+
+    // Crear y añadir el techo de la casa.
+    const rooftop = document.createElement('div');
+    rooftop.className = 'rooftop';
+    rooftop.textContent = roofNumber;
+    container.appendChild(rooftop);
+
+    // Crear y añadir el texto de instrucción.
+    const instruction = document.createElement('p');
+    instruction.textContent = 'Complète les maisons des nombres.';
+    container.appendChild(instruction);
+
+    // Crear el contenedor de las ventanas.
+    const windowsContainer = document.createElement('div');
+    windowsContainer.className = 'windows';
+
+    // Generar y añadir cada fila de ventanas dinámicamente.
+    pairs.forEach(pair => {
+        const row = document.createElement('div');
+        row.className = 'window-row';
+        row.innerHTML = `
+            <span class="window-number">${pair[0]}</span>
+            <span class="plus-sign">+</span>
+            <input type="number" class="window-input" data-correct-value="${pair[1]}" />
+            <span class="equal-sign">=</span>
+            <span class="window-number">${roofNumber}</span>
+        `;
+        windowsContainer.appendChild(row);
+    });
+
+    container.appendChild(windowsContainer);
+
+    // Crear y añadir el botón de verificación.
+    const checkBtn = document.createElement('button');
+    checkBtn.id = 'checkHouseBtn';
+    checkBtn.className = 'submit-btn';
+    checkBtn.textContent = 'Vérifier';
+    checkBtn.setAttribute('aria-label', 'Vérifier les réponses');
+    container.appendChild(checkBtn);
+
+    // Añadir el contenedor completo al DOM.
+    content.appendChild(container);
+
+    // Configurar los botones de navegación.
+    btnBack.style.display = 'inline-block';
+    btnBack.textContent = 'Retour aux niveaux';
+    btnBack.onclick = () => showLevelMenu(currentTopic);
+
+    // Asignar el evento al botón de verificación.
+    checkBtn.addEventListener('click', handleCheckHouses);
+}
+
+/**
+ * Maneja la lógica de verificación del juego.
+ */
+function handleCheckHouses() {
+    const allInputs = document.querySelectorAll('.window-input');
+    let allCorrect = true;
+    let correctCount = 0;
+    const checkBtn = document.getElementById('checkHouseBtn');
+
+    // Deshabilitar el botón temporalmente para evitar clics múltiples.
+    checkBtn.disabled = true;
+
+    // Iterar sobre todos los inputs.
+    allInputs.forEach(input => {
+        const inputValue = parseInt(input.value, 10);
+        const correctValue = parseInt(input.dataset.correctValue, 10);
+        
+        // Limpiar clases de estado previas.
+        input.classList.remove('correct', 'incorrect', 'fx-shake');
+
+        if (inputValue === correctValue) {
+            input.classList.add('correct');
+            input.disabled = true;
+            correctCount++;
+        } else {
+            input.classList.add('incorrect', 'fx-shake');
+            setTimeout(() => input.classList.remove('fx-shake'), 1000);
+            userScore.coins = Math.max(0, userScore.coins - 5);
+            allCorrect = false;
+        }
+    });
+
+    updateUI();
+
+    // Lógica al completar el nivel.
+    if (allCorrect) {
+        userScore.stars += 50;
+        userScore.coins += 50;
+        answeredQuestions[`${currentTopic}-${currentLevel}`] = 'completed';
+        showSuccessMessage('Bravo 🦄✨ !');
+        showConfetti();
+        checkBtn.textContent = 'Niveau suivant';
+        checkBtn.onclick = () => {
+            if (currentLevel < LEVELS_PER_TOPIC) {
+                showNumberHousesGame(currentLevel + 1);
             } else {
-                showErrorMessage(`${correctCount} bonnes réponses. -5 pièces.`);
+                win();
             }
-        });
+        };
+        // Habilitar el botón para el siguiente nivel.
+        checkBtn.disabled = false;
+    } else {
+        showErrorMessage(`${correctCount} bonnes réponses. -5 pièces.`);
+        // Volver a habilitar el botón después de un pequeño retraso.
+        setTimeout(() => checkBtn.disabled = false, 500); 
     }
+}
 
     function generateNumberPairs(sum, count) {
         const pairs = new Set();
