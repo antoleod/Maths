@@ -468,6 +468,7 @@ body {
 .windows {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
   width: 100%;
   padding: 1rem;
@@ -621,10 +622,99 @@ body {
     transition: background-color 0.5s; /* Transición suave del color */
     pointer-events: none; /* Deshabilita interacciones sobre cartas coincididas */
 }
-
+.memory-card.flipped {
+    transform: rotateY(0deg);
+    background-color: var(--card);
+}
 /* Estilos para cartas deshabilitadas (durante comparaciones o si ya coincidieron) */
 .memory-card.disabled {
     pointer-events: none; /* Deshabilita cualquier interacción */
+}
+/* Estilos para el juego de ordenar */
+.sorting-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.sorting-list {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 1rem;
+  border: 2px dashed var(--primary);
+  border-radius: 1rem;
+  min-height: 100px;
+}
+.sortable-item {
+  font-family: var(--font-body);
+  font-size: var(--font-size-large);
+  padding: 0.5rem 1rem;
+  background: var(--card);
+  border-radius: 0.5rem;
+  cursor: grab;
+  box-shadow: var(--shadow-small);
+  transition: transform 0.2s ease-in-out;
+}
+.sortable-item:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+  box-shadow: var(--shadow-medium);
+}
+.sort-input {
+  width: 80px;
+  text-align: center;
+  font-size: var(--font-size-large);
+  border-radius: 0.5rem;
+  border: 1px solid var(--muted);
+  padding: 0.5rem;
+}
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 1rem auto;
+}
+.image-container img {
+    max-width: 100%;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-medium);
+}
+.word-with-blank {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-xxl);
+    text-transform: uppercase;
+    letter-spacing: 5px;
+}
+.blank {
+    display: inline-block;
+    width: 30px;
+    height: 35px;
+    border-bottom: 3px solid var(--ink);
+    margin: 0 5px;
+}
+.sequence-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: var(--font-size-xl);
+}
+.sequence-item {
+    font-size: var(--font-size-xl);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    background: var(--bg2);
+    box-shadow: var(--shadow-small);
+    border: 2px solid transparent;
+}
+.sequence-item.selected {
+    border-color: var(--primary-light);
+    transform: scale(1.05);
 }
 </style>
 </head>
@@ -654,21 +744,28 @@ body {
   <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
   <script>
     // Configuración global del juego
-    const LEVELS_PER_TOPIC = 12;
+    const LEVELS_PER_TOPIC = 10;
     const QUESTIONS_PER_LEVEL = 5;
     const HOUSE_PAIRS_PER_LEVEL = 10;
     const MEMORY_GAME_LEVELS = [
       { level: 1, pairs: 2, grid: '2x2' },
       { level: 2, pairs: 4, grid: '2x4' },
       { level: 3, pairs: 6, grid: '3x4' },
-      { level: 4, pairs: 8, grid: '4x4' }
+      { level: 4, pairs: 8, grid: '4x4' },
+      { level: 5, pairs: 10, grid: '4x5' },
+      { level: 6, pairs: 12, grid: '4x6' },
+      { level: 7, pairs: 14, grid: '4x7' },
+      { level: 8, pairs: 16, grid: '4x8' },
+      { level: 9, pairs: 18, grid: '5x8' },
+      { level: 10, pairs: 20, grid: '5x8' }
     ];
     
     // Emojis y recursos
     const emoji = {
         blue: '🔵', yellow: '🟡', red: '🔴', green: '🟢', orange: '🟠', purple: '🟣',
         car: '🚗', bus: '🚌', plane: '✈️', rocket: '🚀', star: '⭐', coin: '💰', sparkle: '✨',
-        bear: '🐻', rabbit: '🐰', dog: '🐶', cat: '🐱', fish: '🐠', frog: '🐸', bird: '🐦', panda: '🐼'
+        bear: '🐻', rabbit: '🐰', dog: '🐶', cat: '🐱', fish: '🐠', frog: '🐸', bird: '🐦', panda: '🐼',
+        sort: '🗂️', riddle: '🤔', vowel: '🅰️', shape: '🔷', sequence: '➡️'
     };
     
     // Contenido del juego
@@ -760,6 +857,49 @@ body {
       { "question": "Qui leur a enseigné 📖 les secrets de la nature 🌿 ?", "options": ["Le vieux chêne 🌳", "Un oiseau 🐦", "Le vent 🌬️"], "correct": 0 },
       { "question": "Quelle a été leur plus grande leçon 📖 ?", "options": ["La force 💪 et la rapidité 🏃", "La connaissance 📚 et la patience ⏳", "La magie ✨ et la colère 😡"], "correct": 1 }
     ]
+  },
+  {
+    "title": "Le Lapin Volant 🐇🚀",
+    "image": "https://via.placeholder.com/600x400.png?text=Le+lapin+volant",
+    "text": [
+      "Léo le lapin 🐰 rêvait de voler 🚀.",
+      "Tous les autres animaux de la forêt 🌳 se moquaient de lui 😔, car les lapins ne volent pas 🚫.",
+      "Léna 👧 et Yaya 👧 croyaient en lui 💖.",
+      "Elles l'aidèrent à construire une machine ⚙️ volante avec des feuilles 🍃 et des branches 🌳.",
+      "Un jour ☀️, Léo 🐰 sauta du haut d'une colline ⛰️.",
+      "Il tomba un peu au début 📉, mais ensuite, sa machine ⚙️ s'éleva 📈 dans les airs ✨.",
+      "Les autres animaux 🐿️🦊🐻 étaient stupéfaits 😮 !",
+      "Léo 🐰 n'avait pas les ailes 🦅 d'un oiseau 🐦, mais il avait le courage 💖 de croire en lui 🌟.",
+      "Léna 👧 et Yaya 👧 étaient si heureuses 😄 pour leur ami 🐇.",
+      "Elles avaient appris que la persévérance 🧗 et le soutien 🤝 peuvent faire des miracles ✨."
+    ],
+    "quiz": [
+      { "question": "Que voulait Léo le lapin 🐰 ?", "options": ["Courir vite 🏃", "Sauter haut 🤸", "Voler 🚀"], "correct": 2 },
+      { "question": "Qui a aidé Léo 🐰 à construire sa machine ⚙️ ?", "options": ["Un ours 🐻", "Léna 👧 et Yaya 👧", "Un oiseau 🐦"], "correct": 1 },
+      { "question": "Quelle est la morale de cette histoire 📖 ?", "options": ["Il faut être le plus fort 💪", "Il faut écouter les autres 👂", "Croire en soi et persévérer 🌟"], "correct": 2 }
+    ]
+  },
+  {
+    "title": "Le Trésor de la Rivière Brillante 💎🌊",
+    "image": "https://via.placeholder.com/600x400.png?text=Le+tresor+de+la+riviere",
+    "text": [
+      "Au fin fond d'une forêt mystérieuse 🌳, se cachait la Rivière Brillante ✨.",
+      "Léna 👧 et Yaya 👧 décidèrent 🗺️ d'y chercher un trésor 💰 caché.",
+      "Elles trouvèrent une carte 🗺️ qui montrait un chemin 🛤️ rempli d'énigmes 🧠 et de défis 🧗.",
+      "Le premier défi 🧗 était de sauter par-dessus des rochers 🪨.",
+      "Le deuxième était de traverser une cascade 🏞️ sans se mouiller 💦.",
+      "Chaque fois qu'elles résolvaient une énigme 🧠, un indice 🔑 apparaissait.",
+      "Finalement 🎉, elles arrivèrent à la fin de la carte 🗺️.",
+      "Le trésor 💰 n'était pas de l'or 🥇 ou des diamants 💎.",
+      "C'était une graine ✨ magique 🪄 qui, une fois plantée 🌱, faisait pousser un arbre 🌳 qui donnait des fruits 🍎 qui rendaient les gens heureux 😄.",
+      "Léna 👧 et Yaya 👧 avaient compris que le vrai trésor 💎 était de partager 🤝 le bonheur 😊 et la joie 😄.",
+      "Elles avaient accompli un voyage 🚀 inoubliable 💖."
+    ],
+    "quiz": [
+      { "question": "Quel trésor 💰 cherchaient Léna 👧 et Yaya 👧 ?", "options": ["Une graine magique ✨", "De l'or 🥇", "Des diamants 💎"], "correct": 0 },
+      { "question": "Qu'est-ce qui les aidait à trouver le chemin 🛤️ ?", "options": ["Des énigmes 🧠", "Des animaux 🐒", "Des oiseaux 🐦"], "correct": 0 },
+      { "question": "Où se trouvait la graine magique ✨ ?", "options": ["Au fond de la mer 🌊", "Dans un coffre 📦", "Au bout du chemin 🛤️"], "correct": 2 }
+    ]
   }
     ];
 
@@ -771,6 +911,97 @@ body {
         '⚪ Blanc + 🔴 Rouge': 'pink', '🔵 Bleu + 🟡 Jaune': 'green', '🔴 Rouge + 🟡 Jaune': 'orange', '🔵 Bleu + 🔴 Rouge': 'purple',
     };
     
+    // Contenido para el juego de adivinanzas
+    const riddles = [
+        {
+            riddle: "Je suis un animal qui vit dans la mer, mais je ne suis pas un poisson. J'ai huit bras. Qui suis-je?",
+            options: ["Une baleine", "Un requin", "Une pieuvre", "Un crabe"],
+            correct: 2,
+            reward: { stars: 15, coins: 10 }
+        },
+        {
+            riddle: "Je suis grand et vert, et je n'ai pas de bras. Je peux te donner des fruits ou de l'ombre. Qui suis-je?",
+            options: ["Une fleur", "Un arbre", "Un champignon", "Une carotte"],
+            correct: 1,
+            reward: { stars: 15, coins: 10 }
+        },
+        {
+            riddle: "J'ai des rayures noires et blanches, mais je ne suis pas un tigre. Je vis dans la savane africaine. Qui suis-je?",
+            options: ["Un zèbre", "Un guépard", "Une girafe", "Un ours"],
+            correct: 0,
+            reward: { stars: 15, coins: 10 }
+        },
+        {
+            riddle: "Je suis une petite chose qui peut voler sans ailes. Quand tu me donnes de l'air, je monte et je danse. Qui suis-je?",
+            options: ["Une balle", "Un cerf-volant", "Une fusée", "Un oiseau"],
+            correct: 1,
+            reward: { stars: 15, coins: 10 }
+        },
+        {
+            riddle: "Je suis une lumière 💡 qui brille la nuit 🌙. Je te guide quand il fait noir 🌑. Qui suis-je?",
+            options: ["Une voiture 🚗", "Une étoile ✨", "Une bougie 🕯️"],
+            correct: 1,
+            reward: { stars: 20, coins: 15 }
+        },
+        {
+            riddle: "Je suis doux et blanc ☁️. Je vole dans le ciel ☁️. On me voit avant qu'il pleuve 🌧️. Qui suis-je?",
+            options: ["Un oiseau 🐦", "Un nuage ☁️", "Une feuille 🍂"],
+            correct: 1,
+            reward: { stars: 20, coins: 15 }
+        },
+        {
+            riddle: "Je suis le roi 👑 de la jungle 🌳. J'ai une grande crinière. Qui suis-je?",
+            options: ["Un lion 🦁", "Un tigre 🐯", "Un ours 🐻"],
+            correct: 0,
+            reward: { stars: 20, coins: 15 }
+        },
+        {
+            riddle: "J'ai des dents 🦷 mais je ne peux pas manger. Je peux te donner de la couleur 🎨. Qui suis-je?",
+            options: ["Un peigne 💇", "Une fourchette 🍴", "Un crayon ✏️"],
+            correct: 2,
+            reward: { stars: 25, coins: 20 }
+        },
+        {
+            riddle: "Je suis une bête 👹 qui a une corne 🦄 sur le nez 👃. Qui suis-je?",
+            options: ["Une girafe 🦒", "Un rhinocéros 🦏", "Un âne 🐴"],
+            correct: 1,
+            reward: { stars: 25, coins: 20 }
+        },
+        {
+            riddle: "Je n'ai pas de jambes 🚶 mais je peux voyager 🗺️ partout dans le monde. J'ai des villes 🏙️, des rivières 🌊 et des montagnes ⛰️. Qui suis-je?",
+            options: ["Une voiture 🚗", "Un avion ✈️", "Une carte 🗺️"],
+            correct: 2,
+            reward: { stars: 30, coins: 25 }
+        }
+    ];
+
+    // Nuevo contenido para los nuevos juegos
+    const words = [
+        { word: 'chat', image: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png', hint: 'Un animal qui aime les siestes.' },
+        { word: 'soleil', image: 'https://cdn-icons-png.flaticon.com/512/869/869869.png', hint: 'Brille dans le ciel le jour.' },
+        { word: 'pomme', image: 'https://cdn-icons-png.flaticon.com/512/9187/9187979.png', hint: 'Un fruit rouge ou vert.' },
+        { word: 'maison', image: 'https://cdn-icons-png.flaticon.com/512/103/103983.png', hint: 'Où on habite.' },
+        { word: 'livre', image: 'https://cdn-icons-png.flaticon.com/512/29/29291.png', hint: 'On lit des histoires dedans.' },
+        { word: 'fleur', image: 'https://cdn-icons-png.flaticon.com/512/1020/1020478.png', hint: 'On en trouve dans les jardins.' },
+        { word: 'nuage', image: 'https://cdn-icons-png.flaticon.com/512/1271/1271106.png', hint: 'Il flotte dans le ciel.' },
+        { word: 'chien', image: 'https://cdn-icons-png.flaticon.com/512/181/181545.png', hint: 'Le meilleur ami de l\'homme.' },
+        { word: 'étoile', image: 'https://cdn-icons-png.flaticon.com/512/5752/5752496.png', hint: 'Brille dans l\'espace.' },
+        { word: 'table', image: 'https://cdn-icons-png.flaticon.com/512/1055/1055535.png', hint: 'On y pose son assiette.' }
+    ];
+    
+    const sequences = [
+        { items: ['1', '2', '3', '4', '?'], options: ['5', '6', '8'], correct: '5' },
+        { items: ['🔴', '🔵', '🔴', '🔵', '?'], options: ['🔴', '🟢', '🟡'], correct: '🔴' },
+        { items: ['A', 'B', 'C', '?'], options: ['E', 'D', 'F'], correct: 'D' },
+        { items: ['⭐', '⭐', '🚀', '⭐', '⭐', '?'], options: ['⭐', '🚀', '✨'], correct: '🚀' },
+        { items: ['Un', 'Deux', 'Trois', '?'], options: ['Cinq', 'Quatre', 'Six'], correct: 'Quatre' },
+        { items: ['Maison', 'M', 'Ma', '?'], options: ['Main', 'Mais', 'Mai'], correct: 'Mai' },
+        { items: ['Lundi', 'Mardi', 'Mercredi', '?'], options: ['Jeudi', 'Vendredi', 'Samedi'], correct: 'Jeudi' },
+        { items: ['Janvier', 'Février', 'Mars', '?'], options: ['Mai', 'Avril', 'Juin'], correct: 'Avril' },
+        { items: ['0', '10', '20', '?'], options: ['30', '40', '50'], correct: '30' },
+        { items: ['Abeille', 'Baleine', 'Canard', '?'], options: ['Chameau', 'Chat', 'Cheval'], correct: 'Chameau' }
+    ];
+
     // Elementos del DOM
     const content = document.getElementById('content');
     const btnBack = document.getElementById('btnBack');
@@ -789,7 +1020,7 @@ body {
     
     // Base de datos de preguntas generadas dinámicamente
     const allQuestions = {
-        additions: [], soustractions: [], multiplications: [], colors: [], stories: []
+        additions: [], soustractions: [], multiplications: [], colors: [], stories: [], riddles: [], sorting: [], letters: [], shapes: [], vowels: [], sequences: []
     };
     
     /* === Funciones Auxiliares === */
@@ -833,14 +1064,14 @@ body {
         setTimeout(() => promptEl.remove(), 1000);
     }
     
-    function showErrorMessage(message = 'Réponse incorrecte.') {
+    function showErrorMessage(message, correctValue) {
         const promptEl = document.createElement('div');
         promptEl.className = 'prompt bad fx-shake';
-        promptEl.textContent = message;
+        promptEl.textContent = `${message} La bonne réponse était : ${correctValue}.`;
         content.appendChild(promptEl);
         speakText(message);
         playSound('wrong');
-        setTimeout(() => promptEl.remove(), 1000);
+        setTimeout(() => promptEl.remove(), 2500);
     }
 
     function showConfetti() {
@@ -856,10 +1087,8 @@ body {
         let num1, num2, correct, max;
         const rewards = { additions: 10, soustractions: 10, multiplications: 15 };
 
-        // Ajuste de dificultad según los requisitos
-        if (level === 1) max = 10;
-        else if (level === 2) max = 20;
-        else if (level === 3) max = 50;
+        if (level <= 3) max = 10;
+        else if (level <= 6) max = 50;
         else max = 100;
 
         switch(type) {
@@ -874,15 +1103,12 @@ body {
                 correct = num1 - num2;
                 break;
             case 'multiplications':
-                if (level <= 4) { // Tablas del 1 al 5
-                    num1 = Math.floor(Math.random() * 5) + 1;
-                    num2 = Math.floor(Math.random() * 10) + 1;
-                } else if (level <= 8) { // Tablas del 6 al 10
-                    num1 = Math.floor(Math.random() * 5) + 6;
-                    num2 = Math.floor(Math.random() * 10) + 1;
-                } else { // Mixtas
+                if (level <= 5) {
                     num1 = Math.floor(Math.random() * 10) + 1;
                     num2 = Math.floor(Math.random() * 10) + 1;
+                } else {
+                    num1 = Math.floor(Math.random() * 15) + 1;
+                    num2 = Math.floor(Math.random() * 15) + 1;
                 }
                 correct = num1 * num2;
                 break;
@@ -904,10 +1130,10 @@ body {
         const primaryColors = ['🔵 Bleu', '🟡 Jaune', '🔴 Rouge'];
         const secondaryColors = ['🟢 Vert', '🟠 Orange', '🟣 Violet'];
         
-        if (level <= 3) { // Colores primarios
+        if (level <= 4) {
             const color = shuffle(primaryColors)[0];
             questionData = { questionText: `Quelle est la couleur ${color}?`, correct: color };
-        } else if (level <= 6) { // Colores secundarios
+        } else if (level <= 7) {
             const combinations = shuffle([
                 { text: `🔵 Bleu + 🟡 Jaune`, result: '🟢 Vert' },
                 { text: `🔴 Rouge + 🟡 Jaune`, result: '🟠 Orange' },
@@ -915,7 +1141,7 @@ body {
             ]);
             const combo = combinations[0];
             questionData = { questionText: `Quelle couleur obtient-on en mélangeant ${combo.text}?`, correct: combo.result };
-        } else { // Combinaciones abstractas/avanzadas
+        } else {
             const color = shuffle(allColors.filter(c => !primaryColors.includes(c) && !secondaryColors.includes(c)))[0];
             questionData = { questionText: `Quelle couleur est ${color}?`, correct: color };
         }
@@ -933,7 +1159,6 @@ body {
     }
 
     function initializeQuestions() {
-        // Generar 12 niveles para cada categoría
         for (let level = 1; level <= LEVELS_PER_TOPIC; level++) {
             for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) {
                 allQuestions.additions.push(generateMathQuestion('additions', level));
@@ -963,7 +1188,11 @@ body {
             { id: 'number-houses', text: '🏠 Maisons des Nombres' },
             { id: 'colors', text: '🎨 Les Couleurs' },
             { id: 'stories', text: '📚 Contes Magiques' },
-            { id: 'memory', text: '🧠 Mémoire Magique' }
+            { id: 'memory', text: '🧠 Mémoire Magique' },
+            { id: 'sorting', text: '🗂️ Jeu de Tri' },
+            { id: 'riddles', text: '🤔 Jeu d\'énigmes' },
+            { id: 'vowels', text: '🅰️ Jeu des Vocales' },
+            { id: 'sequences', text: '➡️ Jeu des Séquences' },
         ];
 
         allTopics.forEach(topic => {
@@ -976,6 +1205,11 @@ body {
                 currentTopic = topic.id;
                 if (topic.id === 'stories') { showStoryMenu(); }
                 else if (topic.id === 'memory') { showMemoryGameMenu(); }
+                else if (topic.id === 'sorting') { showSortingGame(1); }
+                else if (topic.id === 'riddles') { showRiddleGame(); }
+                else if (topic.id === 'vowels') { showVowelGame(); }
+                else if (topic.id === 'sequences') { showSequenceGame(); }
+                else if (topic.id === 'number-houses') { showNumberHousesGame(1); }
                 else { showLevelMenu(topic.id); }
             });
             topicsContainer.appendChild(btn);
@@ -998,7 +1232,22 @@ body {
         const levelsContainer = document.createElement('div');
         levelsContainer.className = 'options-grid';
 
-        for (let i = 1; i <= LEVELS_PER_TOPIC; i++) {
+        const maxLevels = {
+            'additions': 10,
+            'soustractions': 10,
+            'multiplications': 10,
+            'number-houses': 10,
+            'colors': 10,
+            'memory': MEMORY_GAME_LEVELS.length,
+            'sorting': 10,
+            'riddles': riddles.length,
+            'vowels': words.length,
+            'sequences': sequences.length,
+            'stories': magicStories.length
+        };
+        const totalLevels = maxLevels[currentTopic] || LEVELS_PER_TOPIC;
+        
+        for (let i = 1; i <= totalLevels; i++) {
             const levelBtn = document.createElement('div');
             levelBtn.className = 'option level-btn fx-bounce-in-down';
             levelBtn.textContent = `Niveau ${i}`;
@@ -1010,6 +1259,11 @@ body {
                 currentLevel = i;
                 if (currentTopic === 'number-houses') { showNumberHousesGame(currentLevel); }
                 else if (currentTopic === 'colors') { showColorGame(currentLevel); }
+                else if (currentTopic === 'sorting') { showSortingGame(currentLevel); }
+                else if (currentTopic === 'vowels') { loadVowelQuestion(currentLevel - 1); }
+                else if (currentTopic === 'riddles') { loadRiddleQuestion(currentLevel - 1); }
+                else if (currentTopic === 'sequences') { loadSequenceQuestion(currentLevel - 1); }
+                else if (currentTopic === 'memory') { showMemoryGame(MEMORY_GAME_LEVELS[currentLevel - 1].pairs); }
                 else { currentQuestionIndex = 0; loadQuestion(0); }
             });
             levelsContainer.appendChild(levelBtn);
@@ -1030,6 +1284,7 @@ body {
         
         const userAnswerIndex = parseInt(selected.dataset.index, 10);
         const correctAnswerIndex = questionData.correct;
+        const correctValue = questionData.options[correctAnswerIndex];
 
         if (userAnswerIndex === correctAnswerIndex) {
             selected.classList.add('correct');
@@ -1044,7 +1299,7 @@ body {
             if (correctOption) {
                 correctOption.classList.add('correct');
             }
-            showErrorMessage(`❌ -5 pièces.`);
+            showErrorMessage(`❌ -5 pièces.`, correctValue);
         }
         updateUI();
 
@@ -1156,14 +1411,14 @@ function showNumberHousesGame(level) {
     const checkBtn = document.createElement('button');
     checkBtn.id = 'checkHouseBtn';
     checkBtn.className = 'submit-btn fx-bounce-in-down';
-    checkBtn.textContent = 'Verificar';
-    checkBtn.setAttribute('aria-label', 'Verificar las respuestas');
+    checkBtn.textContent = 'Vérifier';
+    checkBtn.setAttribute('aria-label', 'Vérifier les réponses');
     checkBtn.style.animationDelay = `${pairs.length * 0.1 + 0.5}s`;
     container.appendChild(checkBtn);
     content.appendChild(container);
 
     btnBack.style.display = 'inline-block';
-    btnBack.textContent = 'Volver a los niveles';
+    btnBack.textContent = 'Retour aux niveaux';
     btnBack.onclick = () => showLevelMenu(currentTopic);
 
     checkBtn.addEventListener('click', handleCheckHouses);
@@ -1180,6 +1435,7 @@ function handleCheckHouses() {
 
     checkBtn.disabled = true;
 
+    let incorrectValues = [];
     allInputs.forEach(input => {
         const inputValue = parseInt(input.value, 10);
         const correctValue = parseInt(input.dataset.correctValue, 10);
@@ -1195,6 +1451,7 @@ function handleCheckHouses() {
             setTimeout(() => input.classList.remove('fx-shake'), 1000);
             userScore.coins = Math.max(0, userScore.coins - 5);
             allCorrect = false;
+            incorrectValues.push(`Valor esperado: ${correctValue}`);
         }
     });
 
@@ -1206,7 +1463,7 @@ function handleCheckHouses() {
         answeredQuestions[`${currentTopic}-${currentLevel}`] = 'completed';
         showSuccessMessage('¡Bravo! Todas las casas están correctas. 🦄✨');
         showConfetti();
-        checkBtn.textContent = 'Siguiente nivel';
+        checkBtn.textContent = 'Niveau suivant';
         checkBtn.onclick = () => {
             if (currentLevel < LEVELS_PER_TOPIC) {
                 showNumberHousesGame(currentLevel + 1);
@@ -1217,7 +1474,7 @@ function handleCheckHouses() {
         checkBtn.disabled = false;
     } else {
         const message = `${correctCount} respuestas correctas. ${allInputs.length - correctCount} incorrectas. -5 monedas.`;
-        showErrorMessage(message);
+        showErrorMessage(message, incorrectValues.join(', '));
         setTimeout(() => checkBtn.disabled = false, 500); 
     }
 }
@@ -1301,6 +1558,7 @@ function generateNumberPairs(sum, count) {
         const questionData = questionsForLevel[currentQuestionIndex];
         const userAnswerIndex = parseInt(selected.dataset.index, 10);
         const correctAnswerIndex = questionData.correct;
+        const correctValue = questionData.options[correctAnswerIndex];
 
         if (userAnswerIndex === correctAnswerIndex) {
             selected.classList.add('correct');
@@ -1313,7 +1571,7 @@ function generateNumberPairs(sum, count) {
             userScore.coins = Math.max(0, userScore.coins - 5);
             const correctOption = document.querySelector(`.color-option-button[data-index="${correctAnswerIndex}"]`);
             if (correctOption) { correctOption.classList.add('correct'); }
-            showErrorMessage(`❌ -5 pièces.`);
+            showErrorMessage(`❌ -5 pièces.`, correctValue);
         }
         updateUI();
         setTimeout(() => {
@@ -1445,6 +1703,7 @@ function generateNumberPairs(sum, count) {
         const questionData = storyQuiz[currentQuestionIndex];
         const userAnswerIndex = parseInt(selected.dataset.index, 10);
         const correctAnswerIndex = questionData.correct;
+        const correctValue = questionData.options[correctAnswerIndex];
 
         if (userAnswerIndex === correctAnswerIndex) {
             selected.classList.add('correct');
@@ -1459,7 +1718,7 @@ function generateNumberPairs(sum, count) {
             if (correctOption) {
                 correctOption.classList.add('correct');
             }
-            showErrorMessage('Mauvaise réponse.');
+            showErrorMessage('Mauvaise réponse.', correctValue);
         }
         updateUI();
         
@@ -1514,7 +1773,6 @@ function generateNumberPairs(sum, count) {
         memoryGrid.className = 'memory-grid';
         const levelConfig = MEMORY_GAME_LEVELS.find(l => l.pairs === pairsCount);
         if (levelConfig) {
-          // Ajusta el grid basado en la configuración del nivel
           const gridSize = Math.sqrt(pairsCount * 2);
           memoryGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
         }
@@ -1547,7 +1805,6 @@ function generateNumberPairs(sum, count) {
                 lockBoard = true;
                 const [card1, card2] = flippedCards;
                 if (card1.emoji === card2.emoji) {
-                    // Match
                     card1.card.classList.add('matched');
                     card2.card.classList.add('matched');
                     matchedPairs++;
@@ -1563,7 +1820,6 @@ function generateNumberPairs(sum, count) {
                         setTimeout(showMemoryGameMenu, 2000);
                     }
                 } else {
-                    // No match
                     setTimeout(() => {
                         card1.card.classList.remove('flipped');
                         card2.card.classList.remove('flipped');
@@ -1574,6 +1830,7 @@ function generateNumberPairs(sum, count) {
                         userScore.coins = Math.max(0, userScore.coins - 5);
                         playSound('wrong');
                         updateUI();
+                        showErrorMessage('Mauvaise réponse.', `Il fallait trouver une paire de ${card1.emoji}`);
                     }, 1000);
                 }
             }
@@ -1581,6 +1838,396 @@ function generateNumberPairs(sum, count) {
         btnBack.style.display = 'inline-block';
         btnBack.textContent = 'Retour aux niveaux de mémoire';
         btnBack.onclick = showMemoryGameMenu;
+    }
+    
+    /**
+     * Muestra el juego de ordenar.
+     * @param {number} level El nivel de dificultad.
+     */
+    function showSortingGame(level) {
+        currentLevel = level;
+        content.innerHTML = '';
+        updateUI();
+
+        const container = document.createElement('div');
+        container.className = 'sorting-container fx-bounce-in-down';
+
+        const instruction = document.createElement('p');
+        instruction.className = 'question-prompt';
+        container.appendChild(instruction);
+        
+        const listContainer = document.createElement('div');
+        listContainer.className = 'sorting-list';
+        container.appendChild(listContainer);
+        
+        const checkBtn = document.createElement('button');
+        checkBtn.className = 'submit-btn fx-bounce-in-down';
+        checkBtn.textContent = 'Vérifier';
+        container.appendChild(checkBtn);
+        
+        content.appendChild(container);
+        
+        let items, sortedItems;
+        if (level === 1) { // Números
+            items = shuffle([5, 2, 8, 1, 6]);
+            sortedItems = items.slice().sort((a, b) => a - b);
+            instruction.textContent = "Trie ces nombres du plus petit au plus grand.";
+        } else if (level === 2) { // Colores
+            items = shuffle(['🔴', '🔵', '🟢', '🟡', '🟣']);
+            sortedItems = ['🔴', '🔵', '🟢', '🟡', '🟣'];
+            instruction.textContent = "Trie ces couleurs dans l'ordre de l'arc-en-ciel.";
+        } else if (level === 3) { // Animales
+             items = shuffle(['🐶', '🐱', '🐰', '🐻', '🐼']);
+             sortedItems = ['🐶', '🐱', '🐰', '🐻', '🐼'];
+             instruction.textContent = "Trie ces animaux.";
+        } else if (level === 4) { // Numeros romanos
+            items = shuffle(['I', 'V', 'X', 'L', 'C']);
+            sortedItems = ['I', 'V', 'X', 'L', 'C'];
+            instruction.textContent = "Trie ces nombres romains du plus petit au plus grand.";
+        } else if (level === 5) { // Días de la semana
+            items = shuffle(['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']);
+            sortedItems = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+            instruction.textContent = "Trie ces jours de la semaine.";
+        } else if (level === 6) { // Meses del año
+            items = shuffle(['Janvier', 'Février', 'Mars', 'Avril']);
+            sortedItems = ['Janvier', 'Février', 'Mars', 'Avril'];
+            instruction.textContent = "Trie ces mois dans l'ordre de l'année.";
+        } else if (level === 7) { // Letras
+            items = shuffle(['d', 'c', 'b', 'a']);
+            sortedItems = ['a', 'b', 'c', 'd'];
+            instruction.textContent = "Trie ces lettres dans l'ordre alphabétique.";
+        } else if (level === 8) { // Frutas
+            items = shuffle(['🍎', '🍌', '🍇', '🍊']);
+            sortedItems = ['🍎', '🍌', '🍇', '🍊'];
+            instruction.textContent = "Trie ces fruits par ordre de couleur (rouge, jaune, violet, orange).";
+        } else if (level === 9) { // Tamano
+            items = shuffle(['petit', 'moyen', 'grand', 'énorme']);
+            sortedItems = ['petit', 'moyen', 'grand', 'énorme'];
+            instruction.textContent = "Trie ces mots du plus petit au plus grand.";
+        } else { // Sumas
+            items = shuffle(['5+2', '1+3', '4+1', '3+3']);
+            sortedItems = ['1+3', '4+1', '3+3', '5+2'];
+            instruction.textContent = "Trie ces additions par ordre de résultat croissant.";
+        }
+        
+        speakText(instruction.textContent);
+
+        let draggedItem = null;
+
+        items.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'sortable-item';
+            el.textContent = item;
+            el.draggable = true;
+            listContainer.appendChild(el);
+            
+            el.addEventListener('dragstart', () => {
+                draggedItem = el;
+                setTimeout(() => el.classList.add('dragging'), 0);
+            });
+            
+            el.addEventListener('dragend', () => {
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+            });
+        });
+
+        listContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(listContainer, e.clientX);
+            if (afterElement == null) {
+                listContainer.appendChild(draggedItem);
+            } else {
+                listContainer.insertBefore(draggedItem, afterElement);
+            }
+        });
+
+        function getDragAfterElement(container, x) {
+            const draggableElements = [...container.querySelectorAll('.sortable-item:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = x - box.left - box.width / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        checkBtn.addEventListener('click', () => {
+            const userOrder = [...listContainer.children].map(el => el.textContent);
+            const isCorrect = userOrder.every((item, index) => item == sortedItems[index]);
+            
+            if (isCorrect) {
+                userScore.stars += 30;
+                userScore.coins += 20;
+                showSuccessMessage('C\'est bien trié ! 🎉');
+                showConfetti();
+                checkBtn.textContent = "Niveau suivant";
+                checkBtn.onclick = () => {
+                    if (currentLevel < 10) showSortingGame(currentLevel + 1);
+                    else showLevelMenu(currentTopic);
+                };
+            } else {
+                userScore.coins = Math.max(0, userScore.coins - 5);
+                showErrorMessage('Ce n\'est pas le bon ordre.', `La bonne réponse était: ${sortedItems.join(', ')}`);
+            }
+            updateUI();
+        });
+
+        btnBack.style.display = 'inline-block';
+        btnBack.textContent = 'Retour aux niveaux';
+        btnBack.onclick = () => showLevelMenu(currentTopic);
+    }
+    
+    /**
+     * Muestra el juego de adivinanzas.
+     */
+    function showRiddleGame() {
+        currentTopic = 'riddles';
+        showLevelMenu(currentTopic);
+    }
+    
+    function loadRiddleQuestion(index) {
+        if (index >= riddles.length) {
+            win();
+            return;
+        }
+        
+        currentQuestionIndex = index;
+        content.innerHTML = '';
+        updateUI();
+        
+        const riddleData = riddles[currentQuestionIndex];
+        const fragment = document.createDocumentFragment();
+        
+        const title = document.createElement('div');
+        title.className = 'question-prompt fx-bounce-in-down';
+        title.innerHTML = riddleData.riddle;
+        fragment.appendChild(title);
+        speakText(riddleData.riddle);
+
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'options-grid';
+        
+        const shuffledOptions = shuffle([...riddleData.options]);
+        shuffledOptions.forEach((opt, i) => {
+            const optionEl = document.createElement('button');
+            optionEl.className = 'option fx-bounce-in-down';
+            optionEl.style.animationDelay = `${i * 0.1 + 0.5}s`;
+            optionEl.innerHTML = opt;
+            const originalIndex = riddleData.options.indexOf(opt);
+            optionEl.dataset.index = originalIndex;
+            optionEl.addEventListener('click', handleRiddleAnswer);
+            optionsContainer.appendChild(optionEl);
+        });
+        fragment.appendChild(optionsContainer);
+        content.appendChild(fragment);
+
+        btnBack.style.display = 'inline-block';
+        btnBack.textContent = 'Retour aux niveaux';
+        btnBack.onclick = () => showLevelMenu(currentTopic);
+    }
+    
+    function handleRiddleAnswer(event) {
+        const selected = event.target;
+        const options = document.querySelectorAll('.option');
+        options.forEach(opt => opt.removeEventListener('click', handleRiddleAnswer));
+        
+        const riddleData = riddles[currentQuestionIndex];
+        const userAnswerIndex = parseInt(selected.dataset.index, 10);
+        const correctAnswerIndex = riddleData.correct;
+        const correctValue = riddleData.options[correctAnswerIndex];
+
+        if (userAnswerIndex === correctAnswerIndex) {
+            selected.classList.add('correct');
+            userScore.stars += riddleData.reward.stars;
+            userScore.coins += riddleData.reward.coins;
+            showSuccessMessage('Bonne réponse !');
+            showConfetti();
+        } else {
+            selected.classList.add('wrong');
+            userScore.coins = Math.max(0, userScore.coins - 5);
+            const correctOption = document.querySelector(`[data-index="${correctAnswerIndex}"]`);
+            if (correctOption) {
+                correctOption.classList.add('correct');
+            }
+            showErrorMessage('Mauvaise réponse.', correctValue);
+        }
+        updateUI();
+        setTimeout(() => {
+            currentQuestionIndex++;
+            loadRiddleQuestion(currentQuestionIndex);
+        }, 2000);
+    }
+    
+    // --- NOUVEAUX JEUX ---
+
+    function showVowelGame() {
+        currentTopic = 'vowels';
+        showLevelMenu(currentTopic);
+    }
+    
+    function loadVowelQuestion(index) {
+        if (index >= words.length) {
+            win();
+            return;
+        }
+
+        currentQuestionIndex = index;
+        content.innerHTML = '';
+        updateUI();
+
+        const wordData = words[index];
+        const word = wordData.word;
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        const correctVowel = vowels.find(v => word.includes(v));
+        const blankedWord = word.replace(correctVowel, '<span class="blank"></span>');
+        
+        const title = document.createElement('div');
+        title.className = 'question-prompt fx-bounce-in-down';
+        title.innerHTML = `Quelle voyelle manque ? <div class="word-with-blank">${blankedWord}</div>`;
+        content.appendChild(title);
+        
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'image-container fx-bounce-in-down';
+        imageContainer.innerHTML = `<img src="${wordData.image}" alt="${word}" />`;
+        content.appendChild(imageContainer);
+
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'options-grid';
+        
+        const options = shuffle([...vowels.filter(v => v !== correctVowel).slice(0, 3), correctVowel]);
+        options.forEach(opt => {
+            const optionEl = document.createElement('button');
+            optionEl.className = 'option fx-bounce-in-down';
+            optionEl.textContent = opt.toUpperCase();
+            optionEl.dataset.vowel = opt;
+            optionEl.addEventListener('click', handleVowelAnswer);
+            optionsContainer.appendChild(optionEl);
+        });
+        content.appendChild(optionsContainer);
+        speakText(`Quelle voyelle manque ? ${wordData.hint}`);
+
+        btnBack.style.display = 'inline-block';
+        btnBack.textContent = 'Retour aux niveaux';
+        btnBack.onclick = () => showLevelMenu(currentTopic);
+    }
+
+    function handleVowelAnswer(event) {
+        const selected = event.target;
+        const options = document.querySelectorAll('.option');
+        options.forEach(opt => opt.removeEventListener('click', handleVowelAnswer));
+
+        const wordData = words[currentQuestionIndex];
+        const word = wordData.word;
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        const correctVowel = vowels.find(v => word.includes(v));
+        const userAnswer = selected.dataset.vowel;
+        
+        if (userAnswer === correctVowel) {
+            selected.classList.add('correct');
+            userScore.stars += 10;
+            userScore.coins += 5;
+            showSuccessMessage('C\'est la bonne voyelle !');
+            showConfetti();
+        } else {
+            selected.classList.add('wrong');
+            userScore.coins = Math.max(0, userScore.coins - 5);
+            const correctOption = document.querySelector(`[data-vowel="${correctVowel}"]`);
+            if (correctOption) {
+                correctOption.classList.add('correct');
+            }
+            showErrorMessage('Mauvaise réponse.', correctVowel.toUpperCase());
+        }
+        updateUI();
+
+        setTimeout(() => {
+            loadVowelQuestion(currentQuestionIndex + 1);
+        }, 2000);
+    }
+
+    function showSequenceGame() {
+        currentTopic = 'sequences';
+        showLevelMenu(currentTopic);
+    }
+
+    function loadSequenceQuestion(index) {
+        if (index >= sequences.length) {
+            win();
+            return;
+        }
+
+        currentQuestionIndex = index;
+        content.innerHTML = '';
+        updateUI();
+
+        const questionData = sequences[index];
+        const title = document.createElement('div');
+        title.className = 'question-prompt fx-bounce-in-down';
+        title.textContent = 'Quel est le prochain élément de la séquence ?';
+        content.appendChild(title);
+
+        const sequenceContainer = document.createElement('div');
+        sequenceContainer.className = 'sequence-container fx-bounce-in-down';
+        questionData.items.forEach(item => {
+            const itemEl = document.createElement('span');
+            itemEl.className = 'sequence-item';
+            itemEl.textContent = item;
+            sequenceContainer.appendChild(itemEl);
+        });
+        content.appendChild(sequenceContainer);
+
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'options-grid';
+        
+        const shuffledOptions = shuffle([...questionData.options]);
+        shuffledOptions.forEach(opt => {
+            const optionEl = document.createElement('button');
+            optionEl.className = 'option fx-bounce-in-down';
+            optionEl.textContent = opt;
+            optionEl.dataset.value = opt;
+            optionEl.addEventListener('click', handleSequenceAnswer);
+            optionsContainer.appendChild(optionEl);
+        });
+        content.appendChild(optionsContainer);
+        speakText('Quel est le prochain élément de la séquence ?');
+
+        btnBack.style.display = 'inline-block';
+        btnBack.textContent = 'Retour aux niveaux';
+        btnBack.onclick = () => showLevelMenu(currentTopic);
+    }
+    
+    function handleSequenceAnswer(event) {
+        const selected = event.target;
+        const options = document.querySelectorAll('.option');
+        options.forEach(opt => opt.removeEventListener('click', handleSequenceAnswer));
+        
+        const questionData = sequences[currentQuestionIndex];
+        const userAnswer = selected.dataset.value;
+        const correctValue = questionData.correct;
+
+        if (userAnswer === correctValue) {
+            selected.classList.add('correct');
+            userScore.stars += 15;
+            userScore.coins += 10;
+            showSuccessMessage('Tu as trouvé le bon ordre !');
+            showConfetti();
+        } else {
+            selected.classList.add('wrong');
+            userScore.coins = Math.max(0, userScore.coins - 5);
+            const correctOption = document.querySelector(`[data-value="${correctValue}"]`);
+            if (correctOption) {
+                correctOption.classList.add('correct');
+            }
+            showErrorMessage('Mauvaise réponse.', correctValue);
+        }
+        updateUI();
+
+        setTimeout(() => {
+            loadSequenceQuestion(currentQuestionIndex + 1);
+        }, 2000);
     }
 
     function win() {
